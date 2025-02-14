@@ -50,7 +50,7 @@ class LdapSspApplicationTests {
 	@Test
 	void getMe() {
 		ResponseEntity<JsonNode> response = this.restClient.get()
-			.uri("http://localhost:" + port + "/me")
+			.uri("http://localhost:" + port + "/api/me")
 			.headers(headers -> headers.setBasicAuth("anna.meier", "password456"))
 			.retrieve()
 			.toEntity(JsonNode.class);
@@ -69,7 +69,7 @@ class LdapSspApplicationTests {
 	@Test
 	void getMe_wrongPassword() {
 		ResponseEntity<JsonNode> response = this.restClient.get()
-			.uri("http://localhost:" + port + "/me")
+			.uri("http://localhost:" + port + "/api/me")
 			.headers(headers -> headers.setBasicAuth("anna.meier", "password"))
 			.retrieve()
 			.toEntity(JsonNode.class);
@@ -80,7 +80,7 @@ class LdapSspApplicationTests {
 	void changePassword() {
 		{
 			ResponseEntity<JsonNode> response = this.restClient.post()
-				.uri("http://localhost:" + port + "/change_password")
+				.uri("http://localhost:" + port + "/api/change_password")
 				.contentType(MediaType.APPLICATION_JSON)
 				.body("""
 						{"newPassword": "password789", "oldPassword":  "password456"}
@@ -92,7 +92,7 @@ class LdapSspApplicationTests {
 		}
 		{
 			ResponseEntity<JsonNode> response = this.restClient.get()
-				.uri("http://localhost:" + port + "/me")
+				.uri("http://localhost:" + port + "/api/me")
 				.headers(headers -> headers.setBasicAuth("anna.meier", "password456"))
 				.retrieve()
 				.toEntity(JsonNode.class);
@@ -100,7 +100,7 @@ class LdapSspApplicationTests {
 		}
 		{
 			ResponseEntity<JsonNode> response = this.restClient.get()
-				.uri("http://localhost:" + port + "/me")
+				.uri("http://localhost:" + port + "/api/me")
 				.headers(headers -> headers.setBasicAuth("anna.meier", "password789"))
 				.retrieve()
 				.toEntity(JsonNode.class);
@@ -111,7 +111,7 @@ class LdapSspApplicationTests {
 	@Test
 	void changePassword_wrongOldPassword() {
 		ResponseEntity<JsonNode> response = this.restClient.post()
-			.uri("http://localhost:" + port + "/change_password")
+			.uri("http://localhost:" + port + "/api/change_password")
 			.contentType(MediaType.APPLICATION_JSON)
 			.body("""
 					{"newPassword": "password789", "oldPassword":  "password"}
@@ -125,7 +125,7 @@ class LdapSspApplicationTests {
 	@Test
 	void changePassword_invalidNewPassword() {
 		ResponseEntity<JsonNode> response = this.restClient.post()
-			.uri("http://localhost:" + port + "/change_password")
+			.uri("http://localhost:" + port + "/api/change_password")
 			.contentType(MediaType.APPLICATION_JSON)
 			.body("""
 					{"newPassword": "password", "oldPassword":  "password456"}
@@ -140,7 +140,7 @@ class LdapSspApplicationTests {
 	void resetPassword() {
 		{
 			ResponseEntity<JsonNode> response = this.restClient.post()
-				.uri("http://localhost:" + port + "/reset_password/send_link")
+				.uri("http://localhost:" + port + "/api/reset_password/send_link")
 				.contentType(MediaType.APPLICATION_JSON)
 				.body("""
 						{"email": "anna.meier@example.org"}
@@ -151,7 +151,7 @@ class LdapSspApplicationTests {
 		}
 		{
 			ResponseEntity<JsonNode> response = this.restClient.post()
-				.uri("http://localhost:" + port + "/reset_password")
+				.uri("http://localhost:" + port + "/api/reset_password")
 				.contentType(MediaType.APPLICATION_JSON)
 				.body("""
 						{"resetId": "%s", "password": "password789"}
@@ -162,7 +162,7 @@ class LdapSspApplicationTests {
 		}
 		{
 			ResponseEntity<JsonNode> response = this.restClient.get()
-				.uri("http://localhost:" + port + "/me")
+				.uri("http://localhost:" + port + "/api/me")
 				.headers(headers -> headers.setBasicAuth("anna.meier", "password456"))
 				.retrieve()
 				.toEntity(JsonNode.class);
@@ -170,7 +170,7 @@ class LdapSspApplicationTests {
 		}
 		{
 			ResponseEntity<JsonNode> response = this.restClient.get()
-				.uri("http://localhost:" + port + "/me")
+				.uri("http://localhost:" + port + "/api/me")
 				.headers(headers -> headers.setBasicAuth("anna.meier", "password789"))
 				.retrieve()
 				.toEntity(JsonNode.class);
@@ -181,7 +181,7 @@ class LdapSspApplicationTests {
 	@Test
 	void resetPassword_expiredResetId() {
 		ResponseEntity<JsonNode> response = this.restClient.post()
-			.uri("http://localhost:" + port + "/reset_password")
+			.uri("http://localhost:" + port + "/api/reset_password")
 			.contentType(MediaType.APPLICATION_JSON)
 			.body("""
 					{"resetId": "%s", "password": "password789"}
@@ -195,7 +195,7 @@ class LdapSspApplicationTests {
 	void resetPassword_invalidPassword() {
 		{
 			ResponseEntity<JsonNode> response = this.restClient.post()
-				.uri("http://localhost:" + port + "/reset_password/send_link")
+				.uri("http://localhost:" + port + "/api/reset_password/send_link")
 				.contentType(MediaType.APPLICATION_JSON)
 				.body("""
 						{"email": "anna.meier@example.org"}
@@ -206,7 +206,7 @@ class LdapSspApplicationTests {
 		}
 		{
 			ResponseEntity<JsonNode> response = this.restClient.post()
-				.uri("http://localhost:" + port + "/reset_password")
+				.uri("http://localhost:" + port + "/api/reset_password")
 				.contentType(MediaType.APPLICATION_JSON)
 				.body("""
 						{"resetId": "%s", "password": "password"}
