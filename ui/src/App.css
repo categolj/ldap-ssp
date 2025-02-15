@@ -1,0 +1,176 @@
+/* styles.css */
+:root {
+  font-size: 14px; /* Set the base font size to 14px */
+  --primary-color: #ffd000;
+  --primary-hover: #f3c800;
+  --button-text: #2f2f2f;
+  --error-color: #dc2626;
+  --text-color: #1f2937;
+  --gray-light: #f9fafb;
+  --gray-medium: #e5e7eb;
+  --border-radius: 8px;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Layout */
+.app-container {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  background-color: var(--gray-light);
+}
+
+.app-container h2 {
+  text-align: center;
+  color: var(--text-color);
+  margin-bottom: 1rem; /* Reduced from 1.5rem */
+  font-size: 1.75rem;
+  font-weight: bold;
+}
+
+/* Form Container */
+.form-container {
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto 1rem; /* Reduced bottom margin from 1.5rem */
+  padding: 1.5rem; /* Reduced padding from 2rem */
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--primary-color);
+}
+
+.form-container h3 {
+  color: var(--text-color);
+  margin-bottom: 0.75rem; /* Reduced from 1rem */
+  font-size: 1.25rem;
+  font-weight: 600;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 0.25rem; /* Reduced from 0.5rem */
+}
+
+/* Form Elements */
+.form-field {
+  margin-bottom: 0.75rem; /* Reduced from 1rem */
+}
+
+form {
+  width: 100%;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.25rem; /* Reduced from 0.5rem */
+  color: var(--text-color);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+input {
+  width: 100%;
+  padding: 0.5rem 0.75rem; /* Reduced padding from 0.75rem 1rem */
+  border: 2px solid var(--gray-medium);
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+  transition: border-color 0.2s;
+  background-color: white;
+  box-sizing: border-box;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(255, 208, 0, 0.2);
+}
+
+/* Input Error Message */
+.error-message {
+  color: var(--error-color);
+  font-size: 0.75rem;
+  margin-top: 0.125rem; /* Reduced from 0.25rem */
+}
+
+/* Buttons */
+button {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.75rem 1.5rem; /* Keeping button padding as-is for usability */
+  background-color: var(--primary-color);
+  color: var(--button-text);
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0.75rem auto 0; /* Reduced top margin from 1rem */
+  display: block;
+}
+
+button:hover {
+  background-color: var(--primary-hover);
+}
+
+button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 208, 0, 0.3);
+}
+
+/* Links */
+a {
+  display: inline-block;
+  color: var(--text-color);
+  text-decoration: none;
+  margin-top: 1rem; /* Reduced from 1.5rem */
+  transition: color 0.2s;
+  padding: 0.5rem 0.75rem; /* Reduced horizontal padding */
+  border-radius: var(--border-radius);
+}
+
+/* Reset Form Section */
+.reset-form-section {
+  margin-top: 1rem; /* Reduced from 1.5rem */
+  padding-top: 1rem; /* Reduced from 1.5rem */
+  border-top: 1px solid var(--gray-medium);
+}
+
+/* Message Styles */
+.message {
+  font-size: 0.85rem;
+  padding: 0.5rem; /* Reduced padding from 0.75rem */
+  margin-top: 0.25rem; /* Reduced margin from 0.5rem */
+  border-radius: var(--border-radius);
+  text-align: center;
+  font-weight: 600;
+}
+
+.success-message {
+  background-color: #d1fae5; /* Light green background */
+  color: #065f46; /* Dark green text */
+  border: 1px solid #065f46;
+}
+
+.message.error-message {
+  background-color: #fee2e2; /* Light red background */
+  color: var(--error-color);
+  border: 1px solid var(--error-color);
+}
+
+.message.warning-message {
+  background-color: #fff4e5; /* Light yellow/orange background */
+  color: #9a6700; /* Dark yellow/orange text */
+  border: 1px solid #9a6700;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 840px) {
+  .form-container {
+    padding: 1.25rem; /* Reduced padding for smaller screens */
+  }
+
+  .app-container {
+    padding: 1rem;
+  }
+}
