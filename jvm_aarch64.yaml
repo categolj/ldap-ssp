@@ -1,2 +1,2 @@
-image: ghcr.io/categolj/ldap-ssp@sha256:be028c298fe3c9d2a576ee8a5e3d2987d2b4663ab6c5a71c4df95e7de57be405
-git_revision: 4ac5119e46fb7038c829666eee706a13841b6c2d
+image: ghcr.io/categolj/ldap-ssp@sha256:463dc8f59883758feb9f00f6d2858bb8ec86f8c1a67a807197e5327846781ec5
+git_revision: 440c2d3a0a3b0b5b6b0fd9c85f74a449abe93786
