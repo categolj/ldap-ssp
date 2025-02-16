@@ -9,3 +9,13 @@ export interface PasswordFormData {
     confirmPassword: string;
     email?: string;
 }
+
+export interface Violation {
+    key: string;
+    args: unknown[];
+    defaultMessage: string;
+}
+
+export interface ErrorResponse {
+    violations?: Violation[];
+}

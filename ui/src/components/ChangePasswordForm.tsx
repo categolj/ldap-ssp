@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {FormInput} from './FormInput';
 import {usePasswordValidation} from '../hooks/usePasswordValidation';
+import {Violation} from '../types';
 
 export const ChangePasswordForm: React.FC = () => {
     const {formData, errors, handleChange, validateForm, setFormData} = usePasswordValidation({
@@ -15,14 +16,13 @@ export const ChangePasswordForm: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Reset previous messages
         setSuccessMessage(null);
         setErrorMessage(null);
 
         if (validateForm()) {
-            // Exclude confirmPassword from the payload
-            const {confirmPassword, ...payload} = formData;
-            // Create the Basic authentication header using userId and oldPassword
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const {confirmPassword: _unused, ...payload} = formData;
+            // Create the Basic auth header using userId and oldPassword
             const authHeader = `Basic ${btoa(`${formData.userId}:${formData.oldPassword}`)}`;
             fetch('/api/change_password', {
                 method: 'POST',
@@ -50,14 +50,15 @@ export const ChangePasswordForm: React.FC = () => {
                             if (errorData.violations) {
                                 if (
                                     errorData.violations.some(
-                                        (violation: any) => violation.key
+                                        (violation: Violation) => violation.key
                                             === 'container.greaterThanOrEqual'
                                     )
                                 ) {
                                     setErrorMessage('Password must be at least 8 characters.');
                                 } else if (
                                     errorData.violations.some(
-                                        (violation: any) => violation.key === 'password.required'
+                                        (violation: Violation) => violation.key
+                                            === 'password.required'
                                     )
                                 ) {
                                     setErrorMessage(

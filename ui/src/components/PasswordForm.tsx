@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {FormInput} from './FormInput';
 import {usePasswordValidation} from '../hooks/usePasswordValidation';
+import {ErrorResponse, Violation} from '../types';
 
 export const PasswordForm: React.FC = () => {
     // Retrieve resetId from the URL
@@ -51,18 +52,19 @@ export const PasswordForm: React.FC = () => {
                         setWarningMessage('Reset link expired. Please request a new reset link.');
                     } else if (response.status === 400) {
                         // Parse the JSON response to check for specific violation keys
-                        response.json().then((errorData) => {
+                        response.json().then((errorData: ErrorResponse) => {
                             if (errorData.violations) {
                                 if (
                                     errorData.violations.some(
-                                        (violation: any) => violation.key
+                                        (violation: Violation) => violation.key
                                             === 'container.greaterThanOrEqual'
                                     )
                                 ) {
                                     setErrorMessage('Password must be at least 8 characters.');
                                 } else if (
                                     errorData.violations.some(
-                                        (violation: any) => violation.key === 'password.required'
+                                        (violation: Violation) => violation.key
+                                            === 'password.required'
                                     )
                                 ) {
                                     setErrorMessage(
