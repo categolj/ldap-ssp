@@ -49,7 +49,7 @@ public class SecurityConfig {
 			.authorizeHttpRequests(auth -> auth.requestMatchers(EndpointRequest.toAnyEndpoint())
 				.permitAll()
 				.requestMatchers("/api/reset_password", "/api/reset_password/**", "/", "/index.html",
-						"/reset_password/**", "/assets/**")
+						"/reset_password/**", "/assets/**", "/livez", "/readyz")
 				.permitAll()
 				.anyRequest()
 				.authenticated())
