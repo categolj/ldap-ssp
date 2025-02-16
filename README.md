@@ -12,8 +12,11 @@ It offers two main features:
 > Reset IDs are stored in memory for 5 minutes, so please exercise caution if you plan to scale out
 > or deploy in a serverless environment.
 
-## Docker Usage
+<img width="1024" alt="Image" src="https://github.com/user-attachments/assets/86a8d193-0469-4333-9fdb-c6fcb46516dc" />
 
+
+## Docker Usage
+The Docker image is built using GraalVM Native Image, which means it starts up very fast. 
 You can quickly get started with Docker using the command below:
 
 ```shell
@@ -32,7 +35,8 @@ docker run \
   --sendgrid.url=https://api.sendgrid.com \
   --sendgrid.from=noreply@example.com \
   --sendgrid.api-key=SG.xxxxx \
-  --ssp.external-url=http://localhost:8080
+  --ssp.external-url=http://localhost:8080 \
+  --logging.structured.format.console=ecs
 ```
 
 ---
