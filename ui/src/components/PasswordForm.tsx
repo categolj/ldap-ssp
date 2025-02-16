@@ -2,14 +2,13 @@ import React, {useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {FormInput} from './FormInput';
 import {usePasswordValidation} from '../hooks/usePasswordValidation';
-import {ErrorResponse, Violation} from '../types';
+import {ApiMessage, processApiResponse} from '../utils/apiHelpers';
 
 export const PasswordForm: React.FC = () => {
     // Retrieve resetId from the URL
     const {resetId} = useParams<{ resetId: string }>();
 
     // Initialize form with newPassword and confirmPassword fields.
-    // Assume the hook provides setFormData for resetting the form.
     const {formData, errors, handleChange, validateForm, setFormData} = usePasswordValidation({
         newPassword: '',
         confirmPassword: '',
@@ -18,6 +17,7 @@ export const PasswordForm: React.FC = () => {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [warningMessage, setWarningMessage] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -27,6 +27,7 @@ export const PasswordForm: React.FC = () => {
         setWarningMessage(null);
 
         if (validateForm()) {
+            setIsSubmitting(true);
             // Create payload with new password and resetId
             const payload = {
                 password: formData.newPassword,
@@ -40,50 +41,34 @@ export const PasswordForm: React.FC = () => {
                 },
                 body: JSON.stringify(payload),
             })
-                .then((response) => {
-                    if (response.ok) {
-                        setSuccessMessage('Password reset successfully!');
-                        // Clear the form fields after successful reset
-                        setFormData({
-                            newPassword: '',
-                            confirmPassword: '',
-                        });
-                    } else if (response.status === 410) {
-                        setWarningMessage('Reset link expired. Please request a new reset link.');
-                    } else if (response.status === 400) {
-                        // Parse the JSON response to check for specific violation keys
-                        response.json().then((errorData: ErrorResponse) => {
-                            if (errorData.violations) {
-                                if (
-                                    errorData.violations.some(
-                                        (violation: Violation) => violation.key
-                                            === 'container.greaterThanOrEqual'
-                                    )
-                                ) {
-                                    setErrorMessage('Password must be at least 8 characters.');
-                                } else if (
-                                    errorData.violations.some(
-                                        (violation: Violation) => violation.key
-                                            === 'password.required'
-                                    )
-                                ) {
-                                    setErrorMessage(
-                                        'Password must include alphanumeric characters.');
-                                } else {
-                                    setErrorMessage('Invalid input. Please check your data.');
-                                }
-                            } else {
-                                setErrorMessage('Invalid input. Please check your data.');
-                            }
-                        }).catch(() => {
-                            setErrorMessage('Invalid input. Please check your data.');
-                        });
+                .then((response) =>
+                    processApiResponse(
+                        response,
+                        'Failed to reset password. Please try again.',
+                        {
+                            status410: {
+                                message: 'Reset link expired. Please request a new reset link.',
+                                level: 'warning',
+                            },
+                        }
+                    )
+                )
+                .then(() => {
+                    setSuccessMessage('Password reset successfully!');
+                    setFormData({
+                        newPassword: '',
+                        confirmPassword: '',
+                    });
+                })
+                .catch((apiMessage: ApiMessage) => {
+                    if (apiMessage.level === 'warning') {
+                        setWarningMessage(apiMessage.message);
                     } else {
-                        setErrorMessage('Failed to reset password. Please try again.');
+                        setErrorMessage(apiMessage.message);
                     }
                 })
-                .catch(() => {
-                    setErrorMessage('Failed to reset password. Please try again.');
+                .finally(() => {
+                    setIsSubmitting(false);
                 });
         }
     };
@@ -95,23 +80,27 @@ export const PasswordForm: React.FC = () => {
             {warningMessage && <p className="message warning-message">{warningMessage}</p>}
             {errorMessage && <p className="message error-message">{errorMessage}</p>}
             <form onSubmit={handleSubmit}>
-                <FormInput
-                    id="newPassword"
-                    label="New Password"
-                    type="password"
-                    value={formData.newPassword || ''}
-                    onChange={handleChange}
-                    error={errors.newPassword}
-                />
-                <FormInput
-                    id="confirmPassword"
-                    label="Confirm New Password"
-                    type="password"
-                    value={formData.confirmPassword || ''}
-                    onChange={handleChange}
-                    error={errors.confirmPassword}
-                />
-                <button type="submit">Reset Password</button>
+                <fieldset disabled={isSubmitting}>
+                    <FormInput
+                        id="newPassword"
+                        label="New Password"
+                        type="password"
+                        value={formData.newPassword || ''}
+                        onChange={handleChange}
+                        error={errors.newPassword}
+                    />
+                    <FormInput
+                        id="confirmPassword"
+                        label="Confirm New Password"
+                        type="password"
+                        value={formData.confirmPassword || ''}
+                        onChange={handleChange}
+                        error={errors.confirmPassword}
+                    />
+                    <button type="submit" disabled={isSubmitting}>
+                        Reset Password
+                    </button>
+                </fieldset>
             </form>
         </div>
     );

@@ -83,6 +83,10 @@ input:focus {
   box-shadow: 0 0 0 3px rgba(255, 208, 0, 0.2);
 }
 
+fieldset {
+  border: none;
+}
+
 /* Input Error Message */
 .error-message {
   color: var(--error-color);
@@ -116,6 +120,14 @@ button:hover {
 button:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(255, 208, 0, 0.3);
+}
+
+/* Disabled Button Styles */
+button:disabled {
+  background-color: #ccc; /* A gray background for disabled state */
+  color: #888;            /* Dimmer text */
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 /* Links */
