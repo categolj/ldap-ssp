@@ -19,3 +19,7 @@ export interface Violation {
 export interface ErrorResponse {
     violations?: Violation[];
 }
+
+export interface FormProps {
+    csrfToken: string
+}

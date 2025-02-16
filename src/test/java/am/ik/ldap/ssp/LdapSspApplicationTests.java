@@ -5,9 +5,11 @@ import am.ik.ldap.ssp.password.PasswordService;
 import am.ik.yavi.core.Validated;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,10 @@ class LdapSspApplicationTests {
 	@Value("${maildev.port}")
 	int mainDevPort;
 
+	String csrfToken;
+
+	String jsessionId;
+
 	@BeforeEach
 	void setUp(@Autowired PasswordService passwordService, @Autowired RestClient.Builder restClientBuilder) {
 		// reset password
@@ -45,6 +51,7 @@ class LdapSspApplicationTests {
 		}).build();
 		// clear email
 		this.restClient.delete().uri("http://localhost:" + mainDevPort + "/email/all").retrieve().toBodilessEntity();
+		fetchCsrfToken();
 	}
 
 	@Test
@@ -85,7 +92,11 @@ class LdapSspApplicationTests {
 				.body("""
 						{"newPassword": "password789", "oldPassword":  "password456"}
 						""")
-				.headers(headers -> headers.setBasicAuth("anna.meier", "password456"))
+				.headers(headers -> {
+					headers.setBasicAuth("anna.meier", "password456");
+					headers.set("X-CSRF-TOKEN", csrfToken);
+				})
+				.cookie("JSESSIONID", jsessionId)
 				.retrieve()
 				.toEntity(JsonNode.class);
 			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -116,7 +127,11 @@ class LdapSspApplicationTests {
 			.body("""
 					{"newPassword": "password789", "oldPassword":  "password"}
 					""")
-			.headers(headers -> headers.setBasicAuth("anna.meier", "password456"))
+			.headers(headers -> {
+				headers.setBasicAuth("anna.meier", "password456");
+				headers.set("X-CSRF-TOKEN", csrfToken);
+			})
+			.cookie("JSESSIONID", jsessionId)
 			.retrieve()
 			.toEntity(JsonNode.class);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -130,7 +145,11 @@ class LdapSspApplicationTests {
 			.body("""
 					{"newPassword": "password", "oldPassword":  "password456"}
 					""")
-			.headers(headers -> headers.setBasicAuth("anna.meier", "password456"))
+			.headers(headers -> {
+				headers.setBasicAuth("anna.meier", "password456");
+				headers.set("X-CSRF-TOKEN", csrfToken);
+			})
+			.cookie("JSESSIONID", jsessionId)
 			.retrieve()
 			.toEntity(JsonNode.class);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -145,6 +164,8 @@ class LdapSspApplicationTests {
 				.body("""
 						{"email": "anna.meier@example.org"}
 						""")
+				.headers(headers -> headers.set("X-CSRF-TOKEN", csrfToken))
+				.cookie("JSESSIONID", jsessionId)
 				.retrieve()
 				.toEntity(JsonNode.class);
 			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -156,6 +177,8 @@ class LdapSspApplicationTests {
 				.body("""
 						{"resetId": "%s", "password": "password789"}
 						""".formatted(retrieveResetId()))
+				.headers(headers -> headers.set("X-CSRF-TOKEN", csrfToken))
+				.cookie("JSESSIONID", jsessionId)
 				.retrieve()
 				.toEntity(JsonNode.class);
 			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -186,6 +209,8 @@ class LdapSspApplicationTests {
 			.body("""
 					{"resetId": "%s", "password": "password789"}
 					""".formatted(UUID.randomUUID()))
+			.headers(headers -> headers.set("X-CSRF-TOKEN", csrfToken))
+			.cookie("JSESSIONID", jsessionId)
 			.retrieve()
 			.toEntity(JsonNode.class);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.GONE);
@@ -200,6 +225,8 @@ class LdapSspApplicationTests {
 				.body("""
 						{"email": "anna.meier@example.org"}
 						""")
+				.headers(headers -> headers.set("X-CSRF-TOKEN", csrfToken))
+				.cookie("JSESSIONID", jsessionId)
 				.retrieve()
 				.toEntity(JsonNode.class);
 			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -211,6 +238,8 @@ class LdapSspApplicationTests {
 				.body("""
 						{"resetId": "%s", "password": "password"}
 						""".formatted(retrieveResetId()))
+				.headers(headers -> headers.set("X-CSRF-TOKEN", csrfToken))
+				.cookie("JSESSIONID", jsessionId)
 				.retrieve()
 				.toEntity(JsonNode.class);
 			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -235,6 +264,22 @@ class LdapSspApplicationTests {
 			return matcher.group();
 		}
 		return null;
+	}
+
+	void fetchCsrfToken() {
+		ResponseEntity<JsonNode> response = this.restClient.get()
+			.uri("http://localhost:" + port + "/api/csrf")
+			.retrieve()
+			.toEntity(JsonNode.class);
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		JsonNode body = response.getBody();
+		assertThat(body).isNotNull();
+		this.csrfToken = body.get("csrfToken").asText();
+		String cookie = response.getHeaders().getFirst("Set-Cookie");
+		this.jsessionId = Arrays.stream(cookie.split(";"))
+			.filter(s -> s.startsWith("JSESSIONID="))
+			.map(s -> s.substring("JSESSIONID=".length()))
+			.collect(Collectors.joining());
 	}
 
 }

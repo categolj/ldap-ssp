@@ -2,8 +2,9 @@ import React, {useState} from 'react';
 import {FormInput} from './FormInput';
 import {usePasswordValidation} from '../hooks/usePasswordValidation';
 import {ApiMessage, processApiResponse} from '../utils/apiHelpers';
+import {FormProps} from "../types.ts";
 
-export const ChangePasswordForm: React.FC = () => {
+export const ChangePasswordForm: React.FC<FormProps> = ({csrfToken}) => {
     const {formData, errors, handleChange, validateForm, setFormData} = usePasswordValidation({
         userId: '',
         oldPassword: '',
@@ -34,6 +35,7 @@ export const ChangePasswordForm: React.FC = () => {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': authHeader,
+                    'X-CSRF-TOKEN': csrfToken,
                 },
                 body: JSON.stringify(payload),
             })

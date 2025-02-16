@@ -3,8 +3,9 @@ import {useParams} from 'react-router-dom';
 import {FormInput} from './FormInput';
 import {usePasswordValidation} from '../hooks/usePasswordValidation';
 import {ApiMessage, processApiResponse} from '../utils/apiHelpers';
+import {FormProps} from "../types.ts";
 
-export const PasswordForm: React.FC = () => {
+export const PasswordForm: React.FC<FormProps> = ({csrfToken}) => {
     // Retrieve resetId from the URL
     const {resetId} = useParams<{ resetId: string }>();
 
@@ -38,6 +39,7 @@ export const PasswordForm: React.FC = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
                 },
                 body: JSON.stringify(payload),
             })

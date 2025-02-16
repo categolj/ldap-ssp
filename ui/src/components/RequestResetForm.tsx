@@ -2,8 +2,9 @@ import React, {useState} from 'react';
 import {FormInput} from './FormInput';
 import {usePasswordValidation} from '../hooks/usePasswordValidation';
 import {ApiMessage, processApiResponse} from '../utils/apiHelpers';
+import {FormProps} from "../types.ts";
 
-export const RequestResetForm: React.FC = () => {
+export const RequestResetForm: React.FC<FormProps> = ({csrfToken}) => {
     const {formData, errors, handleChange, validateForm, setFormData} = usePasswordValidation({
         email: '',
     });
@@ -19,7 +20,10 @@ export const RequestResetForm: React.FC = () => {
             setIsSubmitting(true);
             fetch('/api/reset_password/send_link', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
                 body: JSON.stringify(formData),
             }).then((response) =>
                 processApiResponse(

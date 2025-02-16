@@ -1,9 +1,10 @@
 import {ChangePasswordForm} from './ChangePasswordForm';
 import {RequestResetForm} from './RequestResetForm';
+import {FormProps} from "../types.ts";
 
-export const Home: React.FC = () => (
+export const Home: React.FC<FormProps> = ({csrfToken}) => (
     <div className="form-container">
-        <ChangePasswordForm/>
-        <RequestResetForm/>
+        <ChangePasswordForm csrfToken={csrfToken}/>
+        <RequestResetForm csrfToken={csrfToken}/>
     </div>
 );
