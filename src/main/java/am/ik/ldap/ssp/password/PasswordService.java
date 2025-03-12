@@ -20,9 +20,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.query.ConditionCriteria;
 import org.springframework.ldap.query.LdapQuery;
 import org.springframework.ldap.query.LdapQueryBuilder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Component
 public class PasswordService {
@@ -45,7 +47,12 @@ public class PasswordService {
 	}
 
 	public void sendResetLink(String email) {
-		LdapQuery query = LdapQueryBuilder.query().where(this.props.emailAttribute()).is(email);
+		ConditionCriteria criteria = LdapQueryBuilder.query().where(this.props.emailAttribute());
+		boolean useLikeQuery = StringUtils.hasLength(this.props.emailPattern());
+		if (useLikeQuery) {
+			logger.debug("Using like query {}", this.props.emailPattern());
+		}
+		LdapQuery query = useLikeQuery ? criteria.like(this.props.emailPattern().formatted(email)) : criteria.is(email);
 		List<DirContextAdapter> results = ldapTemplate.search(query,
 				(ContextMapper<DirContextAdapter>) ctx -> (DirContextAdapter) ctx);
 		if (results.isEmpty()) {
